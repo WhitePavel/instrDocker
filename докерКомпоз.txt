@@ -1,0 +1,50 @@
+-Используется для управления одним или несколькими контейнерами
+-Содержит инструкции по запуску контейнера
+-Упрощает автоматизацию запуска контейнера 
+-Описывается в YAML файле: docker-compose.yml
+
+Пример:
+version: "3.5"
+services:
+ php-app:
+  image: php:apache :если мы хотим добавить свою программу то вместо image можно указать build
+  container_name: app
+  ports:
+   -'80:80'
+  restart: unless-stopped
+  depends_on:  #Параметр указывающий что этот контейнер запуститься только после запуска остальных контейнеров
+   - app-db
+   - app-redis
+  networks:
+   - internet # эта та сеть ,которая работает в фронтенде
+   - appnet   # эта сеть работабщая в бэкэнде
+
+ app-db:
+  image:postgres
+  container_name: app-postgres
+  restart: unless-stopped
+  environment:
+   - 'POSTGRES_PASSWORD=mypas'
+  networks:
+   - appnet
+
+ app-redis:
+  image:redis
+  container_name: app-redis
+  restart: unless-stopped
+  networks:
+   - appnet
+
+networks:
+ internet:
+  name: internet
+  driver: bridge
+ appnet:
+  name: appnet
+  driver: bridge
+
+
+
+
+
+docker compose logs -f - посмотреть логи комапоза
